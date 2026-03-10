@@ -1,0 +1,12 @@
+{
+  "name": "life-os",
+  "version": "1.0.0",
+  "description": "Personal Life OS — AI agents + Notion",
+  "scripts": {
+    "brief": "node tools/daily-brief.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.5"
+  }
+}
