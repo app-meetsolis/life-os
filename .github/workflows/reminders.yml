@@ -1,0 +1,58 @@
+name: Life OS Reminders
+
+on:
+  schedule:
+    # 10:00 AM IST = 4:30 AM UTC
+    - cron: "30 4 * * *"
+    # 5:00 PM IST = 11:30 AM UTC
+    - cron: "30 11 * * *"
+    # 9:00 PM IST = 3:30 PM UTC
+    - cron: "30 15 * * *"
+    # 11:30 PM IST = 6:00 PM UTC
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+    inputs:
+      type:
+        description: "Reminder type (work/content/evening/habit)"
+        required: true
+        default: work
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Determine reminder type
+        id: type
+        run: |
+          HOUR=$(date -u +"%H")
+          MINUTE=$(date -u +"%M")
+          TIME="${HOUR}${MINUTE}"
+
+          if [ "$TIME" -ge "0430" ] && [ "$TIME" -lt "0500" ]; then
+            echo "type=work" >> $GITHUB_OUTPUT
+          elif [ "$TIME" -ge "1130" ] && [ "$TIME" -lt "1200" ]; then
+            echo "type=content" >> $GITHUB_OUTPUT
+          elif [ "$TIME" -ge "1530" ] && [ "$TIME" -lt "1600" ]; then
+            echo "type=evening" >> $GITHUB_OUTPUT
+          elif [ "$TIME" -ge "1800" ] && [ "$TIME" -lt "1830" ]; then
+            echo "type=habit" >> $GITHUB_OUTPUT
+          else
+            echo "type=${{ github.event.inputs.type || 'work' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send reminder
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: node tools/remind.js ${{ steps.type.outputs.type }}

@@ -1,0 +1,35 @@
+name: Life OS Daily Brief
+
+on:
+  schedule:
+    # 7:00 AM IST = 1:30 AM UTC
+    - cron: "30 1 * * *"
+  workflow_dispatch: # allow manual trigger from GitHub UI
+
+jobs:
+  daily-brief:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run daily brief
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NOTION_DAILY_LOG_DB_ID: 31fdc800-c36f-81c6-89b1-d680cd9bb889
+          NOTION_HABITS_DB_ID: 31fdc800-c36f-81f3-bebb-f206ff758ffd
+          NOTION_TASKS_DB_ID: 2d2dc800-c36f-8130-ab47-d98072fd3a83
+          NOTION_PROJECTS_DB_ID: 2d2dc800-c36f-81ac-bbbf-cacad76ec929
+          NOTION_NOTES_DB_ID: 2d2dc800-c36f-81fd-ac66-f4103682e4ed
+          NOTION_RESOURCES_DB_ID: 2d2dc800-c36f-81c0-8a0e-f45d0f4179c8
+        run: node tools/daily-brief.js
