@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11T13:51:28.994Z",
+  "generatedAt": "2026-03-11T18:39:26.202Z",
   "dailyLogs": [
     {
       "date": "2026-03-11",
@@ -16,98 +16,7 @@
       "top3": "None scheduled"
     }
   ],
-  "habits": [
-    {
-      "name": "Work on MeetSolis",
-      "agent": "James",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": false,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 0,
-      "total": 7
-    },
-    {
-      "name": "Meditation & Book Reading",
-      "agent": "Aria",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": true,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 1,
-      "total": 7
-    },
-    {
-      "name": "Sleep by midnight",
-      "agent": "Aria",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": false,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 0,
-      "total": 7
-    },
-    {
-      "name": "Study block 1hr",
-      "agent": "Atlas",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": false,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 0,
-      "total": 7
-    },
-    {
-      "name": "Create content",
-      "agent": "Muse",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": false,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 0,
-      "total": 7
-    },
-    {
-      "name": "Exercise",
-      "agent": "Aria",
-      "weekly": {
-        "Monday": false,
-        "Tuesday": false,
-        "Wednesday": false,
-        "Thursday": false,
-        "Friday": false,
-        "Saturday": false,
-        "Sunday": false
-      },
-      "doneCount": 0,
-      "total": 7
-    }
-  ],
+  "habits": [],
   "weeklyByArea": {
     "Week -1": {},
     "Week -2": {},
@@ -117,7 +26,7 @@
   "meetsolis": {
     "stories": {
       "Backlog": 0,
-      "In Progress": 0,
+      "In Progress": 1,
       "QA": 0,
       "Done": 0
     },
