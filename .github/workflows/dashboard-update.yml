@@ -1,0 +1,47 @@
+name: Life OS Dashboard Update
+
+on:
+  schedule:
+    # Nightly 11:30 PM IST = 6:00 PM UTC
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate dashboard data
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DAILY_LOG_DB_ID: 31fdc800-c36f-81c6-89b1-d680cd9bb889
+          NOTION_HABITS_DB_ID: 31fdc800-c36f-81f3-bebb-f206ff758ffd
+          NOTION_TASKS_DB_ID: 2d2dc800-c36f-8130-ab47-d98072fd3a83
+          NOTION_MEETSOLIS_STORIES_DB_ID: ${{ secrets.NOTION_MEETSOLIS_STORIES_DB_ID }}
+          NOTION_MEETSOLIS_BUGS_DB_ID: ${{ secrets.NOTION_MEETSOLIS_BUGS_DB_ID }}
+          NOTION_MEETSOLIS_DECISIONS_DB_ID: ${{ secrets.NOTION_MEETSOLIS_DECISIONS_DB_ID }}
+        run: node tools/generate-dashboard-data.js
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dashboard
+          publish_branch: gh-pages
+          commit_message: "chore: update dashboard data [skip ci]"

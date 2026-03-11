@@ -1,0 +1,30 @@
+name: Life OS Evening Summary
+
+on:
+  schedule:
+    # 9:00 PM IST = 3:30 PM UTC
+    - cron: "30 15 * * *"
+  workflow_dispatch:
+
+jobs:
+  evening-summary:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run evening summary
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NOTION_DAILY_LOG_DB_ID: 31fdc800-c36f-81c6-89b1-d680cd9bb889
+        run: node tools/evening-summary.js

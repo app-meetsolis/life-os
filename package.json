@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "Personal Life OS — AI agents + Notion",
   "scripts": {
-    "brief": "node tools/daily-brief.js"
+    "brief": "node tools/daily-brief.js",
+    "evening": "node tools/evening-summary.js",
+    "weekly": "node tools/weekly-report.js",
+    "pulse": "node tools/pulse.js",
+    "setup-dbs": "node tools/setup-new-dbs.js",
+    "dashboard": "node tools/generate-dashboard-data.js"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "rss-parser": "^3.13.0"
   }
 }

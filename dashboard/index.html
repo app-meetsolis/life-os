@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life OS Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e1e4e8;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 24px 0;
+      border-bottom: 1px solid #21262d;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 600; }
+    header p { font-size: 0.8rem; color: #8b949e; margin-top: 4px; padding-bottom: 16px; }
+
+    nav {
+      display: flex;
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 1px solid #21262d;
+    }
+    nav button {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    nav button.active {
+      color: #58a6ff;
+      border-bottom-color: #58a6ff;
+    }
+    nav button:hover { color: #e1e4e8; }
+
+    main { padding: 24px; max-width: 1200px; }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stat-card .label { font-size: 0.75rem; color: #8b949e; margin-bottom: 6px; }
+    .stat-card .value { font-size: 1.5rem; font-weight: 700; }
+    .stat-card .sub { font-size: 0.75rem; color: #8b949e; margin-top: 4px; }
+
+    .chart-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .chart-card h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #8b949e;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .chart-wrap { position: relative; height: 220px; }
+
+    /* Habits grid */
+    .habit-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 12px;
+      background: #0d1117;
+      border-radius: 6px;
+    }
+    .habit-name { min-width: 180px; font-size: 0.875rem; }
+    .habit-dots { display: flex; gap: 4px; }
+    .habit-dot {
+      width: 16px; height: 16px;
+      border-radius: 3px;
+    }
+    .habit-dot.done { background: #238636; }
+    .habit-dot.miss { background: #21262d; }
+    .habit-pct { font-size: 0.75rem; color: #8b949e; margin-left: 8px; }
+
+    /* MeetSolis rings */
+    .rings-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .ring-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .ring-card .count { font-size: 2rem; font-weight: 700; }
+    .ring-card .status-label { font-size: 0.75rem; color: #8b949e; margin-top: 4px; }
+    .ring-card.backlog .count { color: #8b949e; }
+    .ring-card.inprogress .count { color: #58a6ff; }
+    .ring-card.qa .count { color: #d29922; }
+    .ring-card.done .count { color: #3fb950; }
+
+    /* Bugs table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #21262d;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #21262d;
+    }
+    tr:last-child td { border-bottom: none; }
+    .sev-critical { color: #f85149; font-weight: 600; }
+    .sev-high { color: #ff7b72; }
+    .sev-medium { color: #d29922; }
+    .sev-low { color: #8b949e; }
+
+    /* Decisions timeline */
+    .decision-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #21262d;
+    }
+    .decision-item:last-child { border-bottom: none; }
+    .decision-date { font-size: 0.75rem; color: #8b949e; min-width: 90px; }
+    .decision-text { flex: 1; }
+    .decision-title { font-size: 0.875rem; font-weight: 500; }
+    .decision-impact {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #21262d;
+      color: #8b949e;
+      margin-top: 4px;
+    }
+
+    .empty-state { color: #8b949e; font-size: 0.875rem; padding: 20px 0; }
+
+    @media (max-width: 600px) {
+      .rings-row { grid-template-columns: repeat(2, 1fr); }
+      .habit-name { min-width: 120px; font-size: 0.8rem; }
+      nav button { padding: 10px 12px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Life OS Dashboard</h1>
+  <p id="updated">Loading...</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('trends')">Daily Trends</button>
+  <button onclick="showTab('habits')">Habits</button>
+  <button onclick="showTab('weekly')">Weekly</button>
+  <button onclick="showTab('meetsolis')">MeetSolis</button>
+</nav>
+
+<main>
+  <!-- Tab 1: Daily Trends -->
+  <div id="tab-trends" class="tab active">
+    <div class="stats-row" id="stats-trends"></div>
+    <div class="chart-card">
+      <h3>Mood & Energy — Last 30 Days</h3>
+      <div class="chart-wrap">
+        <canvas id="chart-trends"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Habits -->
+  <div id="tab-habits" class="tab">
+    <div class="chart-card">
+      <h3>This Week's Habit Grid</h3>
+      <div id="habits-grid"></div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Weekly Overview -->
+  <div id="tab-weekly" class="tab">
+    <div class="chart-card">
+      <h3>Tasks Completed by Area — Last 4 Weeks</h3>
+      <div class="chart-wrap">
+        <canvas id="chart-weekly"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: MeetSolis -->
+  <div id="tab-meetsolis" class="tab">
+    <div class="rings-row" id="story-rings"></div>
+    <div class="chart-card">
+      <h3>Open Bugs</h3>
+      <div id="bugs-table"></div>
+    </div>
+    <div class="chart-card" style="margin-top: 20px">
+      <h3>Decisions Timeline</h3>
+      <div id="decisions-list"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+let DATA = null;
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + id).classList.add("active");
+  event.target.classList.add("active");
+}
+
+async function loadData() {
+  try {
+    const res = await fetch("data.json?v=" + Date.now());
+    DATA = await res.json();
+    document.getElementById("updated").textContent =
+      "Last updated: " + new Date(DATA.generatedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST";
+    renderAll();
+  } catch (e) {
+    document.getElementById("updated").textContent = "Failed to load data.json";
+  }
+}
+
+function renderAll() {
+  renderTrends();
+  renderHabits();
+  renderWeekly();
+  renderMeetSolis();
+}
+
+function renderTrends() {
+  const logs = (DATA.dailyLogs || []).slice().reverse();
+  const labels = logs.map(l => l.date ? l.date.slice(5) : "");
+  const energyData = logs.map(l => l.energy);
+  const moodData = logs.map(l => l.mood);
+
+  const validEnergies = energyData.filter(v => v !== null);
+  const validMoods = moodData.filter(v => v !== null);
+  const streak = calcStreak(DATA.dailyLogs || []);
+
+  const avgE = validEnergies.length
+    ? (validEnergies.reduce((a,b) => a+b, 0) / validEnergies.length).toFixed(1)
+    : "–";
+  const avgM = validMoods.length
+    ? (validMoods.reduce((a,b) => a+b, 0) / validMoods.length).toFixed(1)
+    : "–";
+
+  // Latest values
+  const latest = DATA.dailyLogs?.[0] || {};
+
+  document.getElementById("stats-trends").innerHTML = `
+    <div class="stat-card">
+      <div class="label">Today Energy</div>
+      <div class="value">${latest.energy !== null && latest.energy !== undefined ? latest.energy + "/5" : "–"}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Today Mood</div>
+      <div class="value">${latest.mood !== null && latest.mood !== undefined ? latest.mood + "/5" : "–"}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg Energy (30d)</div>
+      <div class="value">${avgE}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Avg Mood (30d)</div>
+      <div class="value">${avgM}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Log Streak</div>
+      <div class="value">${streak}</div>
+      <div class="sub">consecutive days</div>
+    </div>
+  `;
+
+  const ctx = document.getElementById("chart-trends").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Energy",
+          data: energyData,
+          borderColor: "#58a6ff",
+          backgroundColor: "rgba(88,166,255,0.08)",
+          tension: 0.3,
+          spanGaps: true,
+          pointRadius: 3,
+        },
+        {
+          label: "Mood",
+          data: moodData,
+          borderColor: "#3fb950",
+          backgroundColor: "rgba(63,185,80,0.08)",
+          tension: 0.3,
+          spanGaps: true,
+          pointRadius: 3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { min: 1, max: 5, ticks: { color: "#8b949e", stepSize: 1 }, grid: { color: "#21262d" } },
+        x: { ticks: { color: "#8b949e", maxTicksLimit: 10 }, grid: { color: "#21262d" } },
+      },
+      plugins: { legend: { labels: { color: "#e1e4e8" } } },
+    },
+  });
+}
+
+function calcStreak(logs) {
+  if (!logs.length) return 0;
+  let streak = 0;
+  const today = new Date().toISOString().split("T")[0];
+  for (let i = 0; i < logs.length; i++) {
+    const expected = new Date();
+    expected.setDate(expected.getDate() - i);
+    const expectedStr = expected.toISOString().split("T")[0];
+    if (logs[i]?.date === expectedStr) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function renderHabits() {
+  const habits = DATA.habits || [];
+  if (!habits.length) {
+    document.getElementById("habits-grid").innerHTML = '<p class="empty-state">No habits data yet.</p>';
+    return;
+  }
+  const html = habits.map(h => {
+    const dots = DAYS.map(d =>
+      `<div class="habit-dot ${h.weekly?.[d] ? "done" : "miss"}" title="${d}"></div>`
+    ).join("");
+    const pct = Math.round((h.doneCount / 7) * 100);
+    return `
+      <div class="habit-row">
+        <div class="habit-name">${h.name || "?"}<br><small style="color:#8b949e">${h.agent || ""}</small></div>
+        <div class="habit-dots">${dots}</div>
+        <div class="habit-pct">${pct}%</div>
+      </div>`;
+  }).join("");
+  document.getElementById("habits-grid").innerHTML = html;
+}
+
+function renderWeekly() {
+  const weekly = DATA.weeklyByArea || {};
+  const weeks = Object.keys(weekly).reverse();
+  const allAreas = [...new Set(weeks.flatMap(w => Object.keys(weekly[w] || {})))];
+
+  const colors = ["#58a6ff","#3fb950","#d29922","#f85149","#bc8cff","#79c0ff"];
+
+  const datasets = allAreas.map((area, i) => ({
+    label: area,
+    data: weeks.map(w => weekly[w]?.[area] || 0),
+    backgroundColor: colors[i % colors.length] + "cc",
+    borderColor: colors[i % colors.length],
+    borderWidth: 1,
+  }));
+
+  const ctx = document.getElementById("chart-weekly").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: { labels: weeks, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, ticks: { color: "#8b949e" }, grid: { color: "#21262d" } },
+        y: { stacked: true, ticks: { color: "#8b949e" }, grid: { color: "#21262d" } },
+      },
+      plugins: { legend: { labels: { color: "#e1e4e8" } } },
+    },
+  });
+}
+
+function renderMeetSolis() {
+  const { stories, bugs, decisions } = DATA.meetsolis || {};
+
+  // Story rings
+  const s = stories || {};
+  document.getElementById("story-rings").innerHTML = `
+    <div class="ring-card backlog">
+      <div class="count">${s.Backlog || 0}</div>
+      <div class="status-label">Backlog</div>
+    </div>
+    <div class="ring-card inprogress">
+      <div class="count">${s["In Progress"] || 0}</div>
+      <div class="status-label">In Progress</div>
+    </div>
+    <div class="ring-card qa">
+      <div class="count">${s.QA || 0}</div>
+      <div class="status-label">QA</div>
+    </div>
+    <div class="ring-card done">
+      <div class="count">${s.Done || 0}</div>
+      <div class="status-label">Done</div>
+    </div>
+  `;
+
+  // Bugs table
+  const bugsArr = bugs || [];
+  if (!bugsArr.length) {
+    document.getElementById("bugs-table").innerHTML = '<p class="empty-state">No open bugs.</p>';
+  } else {
+    const sevClass = (s) => ({ Critical:"sev-critical", High:"sev-high", Medium:"sev-medium", Low:"sev-low" }[s] || "");
+    const rows = bugsArr.map(b => `
+      <tr>
+        <td>${b.title || "–"}</td>
+        <td class="${sevClass(b.severity)}">${b.severity || "–"}</td>
+        <td>${b.story || "–"}</td>
+        <td>${b.dateFound || "–"}</td>
+      </tr>`).join("");
+    document.getElementById("bugs-table").innerHTML = `
+      <table>
+        <thead><tr><th>Bug</th><th>Severity</th><th>Story</th><th>Found</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // Decisions
+  const decsArr = decisions || [];
+  if (!decsArr.length) {
+    document.getElementById("decisions-list").innerHTML = '<p class="empty-state">No decisions logged yet.</p>';
+  } else {
+    const items = decsArr.map(d => `
+      <div class="decision-item">
+        <div class="decision-date">${d.date || "–"}</div>
+        <div class="decision-text">
+          <div class="decision-title">${d.decision || "–"}</div>
+          ${d.why ? `<div style="font-size:0.8rem;color:#8b949e;margin-top:4px">${d.why}</div>` : ""}
+          ${d.impact ? `<span class="decision-impact">${d.impact}</span>` : ""}
+        </div>
+      </div>`).join("");
+    document.getElementById("decisions-list").innerHTML = items;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

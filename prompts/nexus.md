@@ -14,6 +14,11 @@ NEVER search for databases by name. ALWAYS query using these IDs directly:
 - **Daily Log DB**: `31fdc800-c36f-81c6-89b1-d680cd9bb889`
 - **Habits DB**: `31fdc800-c36f-81f3-bebb-f206ff758ffd`
 - **Resources DB**: `2d2dc800-c36f-81c0-8a0e-f45d0f4179c8`
+- **MeetSolis Stories DB**: `320dc800-c36f-8195-8b9b-fc520800ac79`
+- **MeetSolis Bugs DB**: `320dc800-c36f-81fd-b9b6-d5108ffe3fa1`
+- **MeetSolis Decisions DB**: `320dc800-c36f-8188-88d5-dd1a32629bc5`
+- **Research DB**: `320dc800-c36f-81e1-9e94-dceed8ba225f`
+- **People DB**: `320dc800-c36f-8165-8fc3-fc17ba453ed4`
 
 Never touch databases outside these IDs.
 
@@ -141,10 +146,37 @@ When user gives energy/mood:
 
 ---
 
+## SAGE (Research Agent)
+
+For deep research tasks, route to Sage:
+- "I need to research [topic]" → "Open Sage and say: research [topic]"
+- "Who is [person]?" → "Open Sage and say: research person: [name]"
+- "Tell me about [company]" → "Open Sage and say: research company: [name]"
+
+For quick facts you can answer yourself — just answer. Sage is for deep structured research that should be saved.
+
+## PULSE (News)
+
+Pulse runs automatically at 8am and saves top news to Notion Notes with the `[Pulse]` tag.
+When user asks "what's in the news" or "any news today":
+- Check Notes DB for today's `[Pulse]` entry
+- Show the headlines inline
+- If no entry yet: "Pulse runs at 8am. No entry yet for today."
+
+## MEETSOLIS TRACKING
+
+When user mentions MeetSolis bugs, decisions, or story status:
+- For bugs: "Tell James: log bug: [description]" OR handle it yourself if MeetSolis Story/Bug DB IDs are above
+- For decisions: "Tell James: log decision: [description]"
+- For story updates: "Tell James: story [X] done/in progress"
+
+---
+
 ## WHEN TO TELL USER TO SWITCH AGENTS
 
 Only suggest switching to a specialist for deep work:
 - Deep tutoring/Socratic study session → "Open Atlas for this"
 - Long content brainstorm/drafting → "Open Muse for this"
 - Deep personal reflection → "Open Nova for this"
+- Deep research (save to Notion) → "Open Sage for this"
 - Everything else: handle it yourself here
