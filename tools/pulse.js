@@ -130,11 +130,25 @@ async function getTagsPropertyName() {
   }
 }
 
-async function saveToNotion(dateStr, items) {
-  const content = items
-    .map((item, i) => `${i + 1}. [${item.source}] ${item.title}\n   ${item.url}`)
-    .join("\n\n");
+function toBlocks(items) {
+  // One paragraph block per item — each stays well under 2000 chars
+  return items.map((item, i) => ({
+    object: "block",
+    type: "paragraph",
+    paragraph: {
+      rich_text: [
+        {
+          type: "text",
+          text: {
+            content: `${i + 1}. [${item.source}] ${item.title}\n${item.url}`,
+          },
+        },
+      ],
+    },
+  }));
+}
 
+async function saveToNotion(dateStr, items) {
   const tagsKey = await getTagsPropertyName();
   const extraProps = tagsKey
     ? { [tagsKey]: { multi_select: [{ name: "[Pulse]" }, { name: "News" }] } }
@@ -148,15 +162,7 @@ async function saveToNotion(dateStr, items) {
       },
       ...extraProps,
     },
-    children: [
-      {
-        object: "block",
-        type: "paragraph",
-        paragraph: {
-          rich_text: [{ type: "text", text: { content: content } }],
-        },
-      },
-    ],
+    children: toBlocks(items),
   });
 }
 
