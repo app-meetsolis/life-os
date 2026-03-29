@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-28T18:24:31.995Z",
+  "generatedAt": "2026-03-29T18:26:14.799Z",
   "dailyLogs": [
     {
       "date": "March 14, 2026",
@@ -7,6 +7,13 @@
       "mood": 3.5,
       "wins": "✅ Shipped MeetSolis Story 3.4 (AI Summary Generation)\n✅ Desk set up for content creation — ready to shoot from tomorrow",
       "top3": "1. MeetSolis story (3.4 shipped)\n3. desk  optimization for shooting content"
+    },
+    {
+      "date": "2026-03-29",
+      "energy": null,
+      "mood": null,
+      "wins": "",
+      "top3": "• [Muse] Create Instagram account\n• [Nexus] Work on Agnus Media project\n• [James] Deep dive distribution research — Part 2 + implementation plan\n• [Muse] Edit videos (Reel 2 + all shots)"
     },
     {
       "date": "2026-03-28",
@@ -165,6 +172,12 @@
     },
     "bugs": [],
     "decisions": [
+      {
+        "decision": "Keep $99/mo pricing — ",
+        "why": "Otter.ai",
+        "impact": "Product",
+        "date": "2026-03-29"
+      },
       {
         "decision": "PRD v3.2 corrections — cost model, revenue projections, ICF language, free tier",
         "why": "External AI review found 5 critical errors in PRD v3: (1) infra costs understated $20→$100/mo (Vercel Pro + Supabase Pro + Resend required); (2) COGS missing Deepgram $6.50/user ($2.50→$9.00, margin 97.5%→90.9%); (3) revenue projections unrealistic for cold outreach — no existing coaching network; (4) 'ICF-compliant' is legally risky (implies formal certification); (5) free tier limits too restrictive for acquisition (1/3/50 → 3/5/75).",
