@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T18:46:22.017Z",
+  "generatedAt": "2026-05-17T18:51:38.258Z",
   "dailyLogs": [
     {
       "date": "March 14, 2026",
@@ -7,6 +7,13 @@
       "mood": 3.5,
       "wins": "✅ Shipped MeetSolis Story 3.4 (AI Summary Generation)\n✅ Desk set up for content creation — ready to shoot from tomorrow",
       "top3": "1. MeetSolis story (3.4 shipped)\n3. desk  optimization for shooting content"
+    },
+    {
+      "date": "2026-05-17",
+      "energy": null,
+      "mood": null,
+      "wins": "",
+      "top3": "None scheduled"
     },
     {
       "date": "2026-05-16",
@@ -203,13 +210,6 @@
       "mood": null,
       "wins": "",
       "top3": "None scheduled"
-    },
-    {
-      "date": "2026-04-18",
-      "energy": null,
-      "mood": null,
-      "wins": "",
-      "top3": "None scheduled"
     }
   ],
   "habits": [],
@@ -222,12 +222,30 @@
   "meetsolis": {
     "stories": {
       "Backlog": 1,
-      "In Progress": 1,
+      "In Progress": 0,
       "QA": 0,
-      "Done": 16
+      "Done": 18
     },
     "bugs": [],
     "decisions": [
+      {
+        "decision": "Gladia diarized transcript replaces 6.2b streaming transcript as the final version",
+        "why": "Recall's live streaming transcript (6.2b) gives in-meeting immediacy but weak diarization. Gladia re-transcribes the recording post-meeting with 2-3x fewer speaker errors. The diarized transcript overwrites sessions.transcript_text and the AI summary is regenerated on it.",
+        "impact": "Architecture",
+        "date": "2026-05-17"
+      },
+      {
+        "decision": "Bot sessions summarized once by the Gladia pipeline; finalize-streaming skips eager summary",
+        "why": "Bot sessions are summarized by the Gladia path on the diarized transcript. Letting finalize-streaming also summarize on ",
+        "impact": "Performance",
+        "date": "2026-05-17"
+      },
+      {
+        "decision": "Raw bot audio not actively deleted; rely on Recall's 7-day GC, no copy to our storage",
+        "why": "Story 6.2c recording playback depends on the Recall recording existing. Actively deleting it after Gladia transcription would break playback. Copying audio to our own storage adds cost. Recall's 7-day garbage collection satisfies privacy (auto-purged) while keeping playback available for the week after a meeting.",
+        "impact": "Product",
+        "date": "2026-05-17"
+      },
       {
         "decision": "Keep $99/mo pricing — ",
         "why": "Otter.ai",
