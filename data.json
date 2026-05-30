@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T20:05:57.407Z",
+  "generatedAt": "2026-05-30T18:56:39.447Z",
   "dailyLogs": [
     {
       "date": "March 14, 2026",
@@ -7,6 +7,13 @@
       "mood": 3.5,
       "wins": "✅ Shipped MeetSolis Story 3.4 (AI Summary Generation)\n✅ Desk set up for content creation — ready to shoot from tomorrow",
       "top3": "1. MeetSolis story (3.4 shipped)\n3. desk  optimization for shooting content"
+    },
+    {
+      "date": "2026-05-30",
+      "energy": null,
+      "mood": null,
+      "wins": "",
+      "top3": "None scheduled"
     },
     {
       "date": "2026-05-29",
@@ -203,13 +210,6 @@
       "mood": null,
       "wins": "",
       "top3": "None scheduled"
-    },
-    {
-      "date": "2026-05-01",
-      "energy": null,
-      "mood": null,
-      "wins": "",
-      "top3": "None scheduled"
     }
   ],
   "habits": [],
@@ -221,13 +221,49 @@
   },
   "meetsolis": {
     "stories": {
-      "Backlog": 2,
-      "In Progress": 0,
+      "Backlog": 7,
+      "In Progress": 1,
       "QA": 0,
-      "Done": 21
+      "Done": 22
     },
     "bugs": [],
     "decisions": [
+      {
+        "decision": "Epic 7 manual AI Intelligence Strip refresh = Pro-only (cost control)",
+        "why": "MVP cost discipline. Manual refresh is spammable (each click = AI call). Auto-regen on session is already bounded by free session limits (~$0.05 lifetime per Free user, negligible). Hiding manual refresh from Free eliminates spam risk while still showing strip value AND creates upgrade pressure (matches Story 6.5 Pro-gating pattern).",
+        "impact": "Product",
+        "date": "2026-05-30"
+      },
+      {
+        "decision": "Epic 7 migration numbering = ship-order at dev-time, not story-number",
+        "why": "Epic 7 stories ship out of numeric order (7.1 → 7.4 → 7.2 → 7.7 → 7.6 → 7.5 → 7.3). Several stories add columns to same tables (clients, sessions). Postgres migrations apply in fixed sequence — numbering by story would create out-of-order chaos. All migrations written idempotent (ADD COLUMN IF NOT EXISTS / CREATE TABLE IF NOT EXISTS) for safety.",
+        "impact": "Architecture",
+        "date": "2026-05-30"
+      },
+      {
+        "decision": "Story 7.5 email provider = nodemailer/Gmail, NOT Resend",
+        "why": "Story 5.1 spec called for Resend; actual production code uses nodemailer + Gmail (apps/web/src/lib/mail.ts). Story 5.8 (transactional emails) was DROPPED so Resend was never wired. Epic 7 spec's \"Resend already configured\" is incorrect. Reusing existing nodemailer pattern avoids adding a new vendor/cost during MVP launch.",
+        "impact": "Architecture",
+        "date": "2026-05-30"
+      },
+      {
+        "decision": "Story 7.6 action_items uses existing 'assignee' column, NOT new 'assignee_type'",
+        "why": "Epic 7 spec said add 'assignee_type'. Existing migration 015 already created 'assignee TEXT CHECK (assignee IN coach, client)'. Adding a parallel column = duplication + confusion. Same for 'completed BOOLEAN' (existing) vs proposed 'status' field. Decision: extend existing CHECK to allow 'unknown'; keep 'completed' BOOLEAN as-is. No rename.",
+        "impact": "Architecture",
+        "date": "2026-05-30"
+      },
+      {
+        "decision": "Story 7.3 deletes old Story 1.8 onboarding entirely (no parallel old/new flow)",
+        "why": "apps/web/src/app/onboarding/page.tsx + components/onboarding/* directory were built for Story 1.8 (pre-pivot, video conferencing era). Epic 7 superseded that entirely. Keeping both = dead code + confusion + maintenance burden. Cleanest: delete during 7.3, rebuild under same /onboarding route. Story 5.5 (old 5-step onboarding spec) was also already declared superseded.",
+        "impact": "Architecture",
+        "date": "2026-05-30"
+      },
+      {
+        "decision": "Demo client Alex Rivera brief = hand-written static content, not per-signup AI generation",
+        "why": "Path B onboarding aha moment depends on Alex's brief feeling real. Generating per-signup adds AI cost ($0.01/signup brief gen) and quality variance. Hand-written content baked into demo-client-data.ts + seeded into coach_briefs table on signup. Real Story 6.4 component renders it. Zero per-signup AI cost; higher content quality; deterministic.",
+        "impact": "Architecture",
+        "date": "2026-05-30"
+      },
       {
         "decision": "Gladia diarized transcript replaces 6.2b streaming transcript as the final version",
         "why": "Recall's live streaming transcript (6.2b) gives in-meeting immediacy but weak diarization. Gladia re-transcribes the recording post-meeting with 2-3x fewer speaker errors. The diarized transcript overwrites sessions.transcript_text and the AI summary is regenerated on it.",
@@ -251,18 +287,6 @@
         "why": "Otter.ai",
         "impact": "Product",
         "date": "2026-03-29"
-      },
-      {
-        "decision": "PRD v3.2 corrections — cost model, revenue projections, ICF language, free tier",
-        "why": "External AI review found 5 critical errors in PRD v3: (1) infra costs understated $20→$100/mo (Vercel Pro + Supabase Pro + Resend required); (2) COGS missing Deepgram $6.50/user ($2.50→$9.00, margin 97.5%→90.9%); (3) revenue projections unrealistic for cold outreach — no existing coaching network; (4) 'ICF-compliant' is legally risky (implies formal certification); (5) free tier limits too restrictive for acquisition (1/3/50 → 3/5/75).",
-        "impact": "Product",
-        "date": "2026-03-19"
-      },
-      {
-        "decision": "Landing Page UI Design — Stitch MCP Session (Apr 4 2026)",
-        "why": "",
-        "impact": null,
-        "date": null
       }
     ]
   }
